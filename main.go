@@ -1,7 +1,9 @@
 package main
 
 import (
+	"embed"
 	"fmt"
+	"io/fs"
 	"log"
 	"net/http"
 	"strconv"
@@ -9,6 +11,11 @@ import (
 
 	"github.com/gorilla/websocket"
 )
+
+const StaticAssetsDir = "static"
+
+//go:embed static/*
+var staticFiles embed.FS
 
 type Message struct {
 	From    *websocket.Conn
@@ -90,6 +97,14 @@ func main() {
 			[]byte(full),
 		)
 	})
+
+	staticFS, err := fs.Sub(staticFiles, "static")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fs := http.FileServer(http.FS(staticFS))
+	http.Handle("/", fs)
 
 	fmt.Println("Server starting...")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
