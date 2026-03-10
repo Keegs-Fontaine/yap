@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="static/reset.css">
     <link rel="stylesheet" href="static/index.css">
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.js"
+        integrity="sha384-ezjq8118wdwdRMj+nX4bevEi+cDLTbhLAeFF688VK8tPDGeLUe0WoY2MZtSla72F"
+        crossorigin="anonymous"></script>
     <title>Yap</title>
 </head>
 
@@ -26,7 +29,7 @@
 
         <section class="room-list-rooms">
             {{ range . }}
-            <button class="room-list-room-preview">
+            <button hx-get="/view/{{ .Id }}" hx-target="#room" class="room-list-room-preview">
                 <div class="room-list-pfp">
                     {{ if ne .PFP "" }}
                     <img src={{ .PFP }} alt="">
@@ -50,6 +53,10 @@
             {{ end }}
         </section>
     </aside>
+
+    <main class="room" id="room">
+
+    </main>
 </body>
 
 </html>

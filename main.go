@@ -32,6 +32,7 @@ type RoomListing struct {
 	LastMessage string
 	Date        string
 	PFP         string
+	Id          int
 }
 
 var upgrader = websocket.Upgrader{
@@ -97,12 +98,16 @@ func main() {
 			w.Write([]byte("Invalid Room ID"))
 		}
 
-		room := rooms[roomIndex]
-		full := strings.Join(viewRoom(&room), "")
+		if roomIndex < len(rooms) {
+			room := rooms[roomIndex]
+			full := strings.Join(viewRoom(&room), "")
 
-		w.Write(
-			[]byte(full),
-		)
+			w.Write(
+				[]byte(full),
+			)
+		} else {
+			http.Error(w, "Err! That Room Doesn't Exist!", http.StatusBadRequest)
+		}
 	})
 
 	fs := http.FileServer(http.Dir("./static"))
@@ -115,17 +120,20 @@ func main() {
 				LastMessage: "HEY DUDE WTF??? Where's my crystal ball????",
 				Date:        "12/22/2003",
 				PFP:         "/static/images/SAMPLE-pfp-1.png",
+				Id:          0,
 			},
 			{
 				Name:        "Some Name",
 				LastMessage: "Hey I'm a generic message! Aren't I cooler than lorem ipsum???",
 				Date:        "3/2/2006",
 				PFP:         "/static/images/SAMPLE-pfp-2.png",
+				Id:          1,
 			},
 			{
 				Name:        "Dark Souls",
 				LastMessage: "Rahhh I'm the dark souls guy",
 				Date:        "5/23/2024",
+				Id:          2,
 			},
 		}
 
