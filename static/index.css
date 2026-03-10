@@ -1,3 +1,79 @@
-h1 {
-    color: red;
+:root {
+    --clr-neutral-900: hsl(0, 0%, 93%);
+}
+
+html,
+body {
+    height: 100vh;
+}
+
+body {
+    padding: 1rem;
+}
+
+.room-list {
+    max-width: 30rem;
+    height: 100%;
+    padding: 1rem;
+
+    border-radius: 1rem;
+
+    background-color: var(--clr-neutral-900);
+}
+
+.room-list-header {
+    margin-bottom: 2rem;
+}
+
+.room-list-header {
+    display: flex;
+}
+
+.room-list-plus-btn {
+    margin-right: auto;
+}
+
+.room-list-room-preview {
+    width: 100%;
+    display: flex;
+}
+
+.room-list-pfp {
+    flex: 0 0 4rem;
+    height: 4rem;
+
+    overflow: hidden;
+}
+
+.room-list-pfp img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.room-list-preview-content {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.room-list-name {
+    grid-column: 1 / 1;
+    font-weight: bold;
+}
+
+.room-list-date {
+    grid-column: 2 / -1;
+    justify-self: end;
+
+    font-style: italic;
+}
+
+.room-list-last-message {
+    grid-column: span 2;
+
+    text-wrap: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }

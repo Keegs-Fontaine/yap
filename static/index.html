@@ -1,12 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./index.css">
-    <title>Document</title>
+    <link rel="stylesheet" href="static/reset.css">
+    <link rel="stylesheet" href="static/index.css">
+    <title>Yap</title>
 </head>
+
 <body>
-    <h1>Hey</h1>
+    <aside class="room-list">
+        <header class="room-list-header">
+            <button class="room-list-plus-btn">
+                <img alt="Add New Room" src="static/images/plus.svg">
+            </button>
+
+            <button class="room-list-search-btn">
+                <img alt="Search Rooms" src="static/images/search.svg">
+            </button>
+            <button class="room-list-options-btn">
+                <img alt="Filter And Sort" src="static/images/options.svg">
+            </button>
+        </header>
+
+        <section class="room-list-rooms">
+            {{ range . }}
+            <button class="room-list-room-preview">
+                <div class="room-list-pfp">
+                    {{ if ne .PFP "" }}
+                    <img src={{ .PFP }} alt="">
+                    {{ else }}
+                    <img src="static/images/placeholder-pfp.svg" />
+                    {{end}}
+                </div>
+
+                <section class="room-list-preview-content">
+                    <span class="room-list-name">{{ .Name }}</span>
+
+                    <span class="room-list-date">
+                        {{ .Date }}
+                    </span>
+
+                    <span class="room-list-last-message">
+                        {{ .LastMessage }}
+                    </span>
+                </section>
+            </button>
+            {{ end }}
+        </section>
+    </aside>
 </body>
+
 </html>

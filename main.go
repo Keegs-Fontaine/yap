@@ -3,7 +3,7 @@ package main
 import (
 	"embed"
 	"fmt"
-	"io/fs"
+	"html/template"
 	"log"
 	"net/http"
 	"strconv"
@@ -25,6 +25,13 @@ type Message struct {
 type Room struct {
 	Name     string
 	Messages []Message
+}
+
+type RoomListing struct {
+	Name        string
+	LastMessage string
+	Date        string
+	PFP         string
 }
 
 var upgrader = websocket.Upgrader{
@@ -98,13 +105,33 @@ func main() {
 		)
 	})
 
-	staticFS, err := fs.Sub(staticFiles, "static")
-	if err != nil {
-		log.Fatal(err)
-	}
+	fs := http.FileServer(http.Dir("./static"))
+	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
-	fs := http.FileServer(http.FS(staticFS))
-	http.Handle("/", fs)
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		roomListings := []RoomListing{
+			{
+				Name:        "wizard",
+				LastMessage: "HEY DUDE WTF??? Where's my crystal ball????",
+				Date:        "12/22/2003",
+				PFP:         "/static/images/SAMPLE-pfp-1.png",
+			},
+			{
+				Name:        "Some Name",
+				LastMessage: "Hey I'm a generic message! Aren't I cooler than lorem ipsum???",
+				Date:        "3/2/2006",
+				PFP:         "/static/images/SAMPLE-pfp-2.png",
+			},
+			{
+				Name:        "Dark Souls",
+				LastMessage: "Rahhh I'm the dark souls guy",
+				Date:        "5/23/2024",
+			},
+		}
+
+		tmpl := template.Must(template.ParseFiles("./static/index.html"))
+		tmpl.Execute(w, roomListings)
+	})
 
 	fmt.Println("Server starting...")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
