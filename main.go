@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/gorilla/websocket"
 )
@@ -35,21 +34,16 @@ type RoomListing struct {
 	Id          int
 }
 
+type MessageListing struct {
+	Name    string
+	Message string
+	Date    string
+	PFP     string
+}
+
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
-}
-
-func viewRoom(r *Room) []string {
-	formattedMessages := []string{fmt.Sprintf("ROOM %s\n\n------------\n\n", r.Name)}
-
-	for _, m := range r.Messages {
-		formattedMessages = append(formattedMessages,
-			fmt.Sprintf("========\nNAME: %s\nMESSAGE: %s\n========\n", m.From.RemoteAddr(), m.Content),
-		)
-	}
-
-	return formattedMessages
 }
 
 func main() {
@@ -63,35 +57,48 @@ func main() {
 		if err != nil {
 			log.Println("Err! Couldn't connect to websocket!", err)
 		}
+		defer conn.Close()
 
 		for {
 			var message struct {
-				RoomId  int
+				RoomId  string
 				Message string
 			}
 
 			if err := conn.ReadJSON(&message); err != nil {
 				log.Println("Err! Couldn't parse JSON message!", err)
+				break
 			}
 
-			room := &rooms[message.RoomId]
+			roomIndex, err := strconv.Atoi(message.RoomId)
+			if err != nil {
+				log.Println("Err! Couldn't parse ascii integer!", err)
+			}
+
+			room := &rooms[roomIndex]
 
 			room.Messages = append(room.Messages, Message{
 				From:    conn,
 				Content: message.Message,
 			})
 
-			if err := conn.WriteJSON(map[string]int{"apple": 5, "lettuce": 7}); err != nil {
-				log.Println("Err! Couldn't write JSON message!", err)
+			wsWriter, err := conn.NextWriter(websocket.TextMessage)
+			if err != nil {
+				log.Println("Err! Can't get next IO writer!", err)
 			}
+
+			tmpl := template.Must(template.ParseFiles("./static/templates/message.html"))
+			tmpl.Execute(wsWriter, []MessageListing{
+				{Name: conn.RemoteAddr().String(), Message: message.Message, Date: "2-2-2", PFP: "static/images/SAMPLE-pfp-1.png"},
+			})
+
+			wsWriter.Close()
 		}
 	})
 
 	http.HandleFunc("/view/{id}", func(w http.ResponseWriter, r *http.Request) {
 		roomPath := r.PathValue("id")
 		roomIndex, err := strconv.Atoi(roomPath)
-
-		fmt.Println(rooms)
 
 		if err != nil {
 			log.Println("Err! Couldn't get roomIndex", err)
@@ -100,11 +107,21 @@ func main() {
 
 		if roomIndex < len(rooms) {
 			room := rooms[roomIndex]
-			full := strings.Join(viewRoom(&room), "")
 
-			w.Write(
-				[]byte(full),
-			)
+			messages := []MessageListing{}
+
+			for _, msg := range room.Messages {
+				messages = append(messages, MessageListing{
+					Name:    "wizard",
+					PFP:     "static/images/SAMPLE-pfp-1.png",
+					Date:    "10-22-24",
+					Message: msg.Content,
+				})
+			}
+
+			tmpl := template.Must(template.ParseFiles("./static/templates/message.html"))
+
+			tmpl.Execute(w, messages)
 		} else {
 			http.Error(w, "Err! That Room Doesn't Exist!", http.StatusBadRequest)
 		}

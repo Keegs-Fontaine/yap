@@ -9,6 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.js"
         integrity="sha384-ezjq8118wdwdRMj+nX4bevEi+cDLTbhLAeFF688VK8tPDGeLUe0WoY2MZtSla72F"
         crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/ws.js"></script>
     <title>Yap</title>
 </head>
 
@@ -29,10 +30,10 @@
 
         <section class="room-list-rooms">
             {{ range . }}
-            <button hx-get="/view/{{ .Id }}" hx-target="#room" class="room-list-room-preview">
+            <button hx-get="/view/{{ .Id }}" hx-target="#messages-list" class="room-list-room-preview">
                 <div class="room-list-pfp">
                     {{ if ne .PFP "" }}
-                    <img src={{ .PFP }} alt="">
+                    <img src="{{ .PFP }}" alt="">
                     {{ else }}
                     <img src="static/images/placeholder-pfp.svg" />
                     {{end}}
@@ -54,8 +55,15 @@
         </section>
     </aside>
 
-    <main class="room" id="room">
-
+    <main hx-ext="ws" ws-connect="/ws" class="messages">
+        <section class="messages-list" id="messages-list" hx-swap-oob="beforeend"></section>
+        <form action="" ws-send>
+            <input name="Message" type="text">
+            <input type="number" name="RoomId" id="">
+            <button type="submit">
+                Submit
+            </button>
+        </form>
     </main>
 </body>
 

@@ -1,5 +1,6 @@
 :root {
     --clr-neutral-900: hsl(0, 0%, 93%);
+    --clr-neutral-950: hsla(0, 0%, 98%);
 }
 
 html,
@@ -10,11 +11,15 @@ body {
 body {
     padding: 1rem;
     display: flex;
+    gap: 1rem;
 }
 
 .room-list {
     max-width: 30rem;
+    min-width: 20rem;
+    width: 30vw;
     height: 100%;
+    flex-shrink: 0;
     padding: 1rem;
 
     border-radius: 1rem;
@@ -77,4 +82,11 @@ body {
     text-wrap: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+}
+
+.messages {
+    padding: 1rem;
+    border-radius: 1rem;
+    flex-grow: 1;
+    background-color: var(--clr-neutral-950);
 }

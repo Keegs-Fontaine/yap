@@ -1,0 +1,21 @@
+{{ range . }}
+<article hx-swap-oob="beforeend:#messages-list" class="messages-message">
+    <div class="messages-pfp">
+        {{ if ne .PFP "" }}
+        <img src="{{ .PFP }}" alt="">
+        {{ else }}
+        <img src="static/images/placeholder-pfp.svg" />
+        {{end}}
+    </div>
+
+    <section class="messages-preview-content">
+        <span class="messages-date">
+            {{ .Date }}
+        </span>
+
+        <span class="messages-name">{{ .Name }}</span>
+
+        <span class="messages-message">{{ .Message }}</span>
+    </section>
+</article>
+{{ end }}
